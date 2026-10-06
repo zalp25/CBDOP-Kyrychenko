@@ -15,8 +15,6 @@ function input(question: string): Promise<string> {
 
 
 
-
-
 enum Category {
     BusinessAnalyst = "Business analyst",
     Developer = "Developer",
@@ -50,14 +48,16 @@ function getAllWorkers(): Worker[] {
 }
 
 
-function getWorkersSurnamesByCategory(category: Category): Array<string> {
+function getWorkersSurnamesByCategory(category: Category = Category.Designer): Array<string> {
     const workers: Worker[] = getAllWorkers();
     const surnames: Array<string> = [];
-    for (const worker of workers){
-        if (worker.category === category){
+
+    for (const worker of workers) {
+        if (worker.category === category) {
             surnames.push(worker.surname)
         }
     }
+
     return surnames;
 }
 
@@ -88,18 +88,63 @@ function logWorkersNames(workers: string[]): void {
 interface workerData {
     name: string;
     surname: string;
-    id: number;
+    salary: number;
 }
 
 function getWorkerByID(id: number, workers: Worker[] = getAllWorkers()): workerData {
-    const worker = workers.find((worker) => worker.id === id);
+    const worker: Worker | undefined = workers.find((worker) => worker.id === id);
 
     if (worker !== undefined) {
-        return {name: worker.name, surname: worker.surname, id: worker.id};
+        return {name: worker.name, surname: worker.surname, salary: worker.salary};
     }
 
-    return {name: "Немає такого працівника", surname: "", id: id};
+    return {name: "Немає такого працівника", surname: "", salary: 0};
 }
+
+
+function createCustomerID(name: string, id: number): string {
+    let customer: string = name + String(id);
+    return customer;
+}
+
+
+let idGenerator: (name: string, id: number) => string = (name: string, id: number): string => {
+    return name + String(id);
+};
+
+function createCustomer(name: string, age?: number, city?: string): void {
+    console.log(`Ім'я замовника: ${name}`);
+
+    if (age !== undefined) {
+        console.log(`Вік замовника: ${age}`);
+    }
+
+    if (city !== undefined) {
+        console.log(`Місто замовника: ${city}`);
+    }
+}
+
+
+function checkoutWorkers(customer: string, ...workerIDs: number[]): string[] {
+    console.log(`Замовник: ${customer}`);
+
+    const availableWorkers: string[] = [];
+
+    workerIDs.forEach((workerID) => {
+        const worker: workerData = getWorkerByID(workerID);
+
+        if (worker.salary !== 0) {
+            const foundWorker: Worker | undefined = getAllWorkers().find((worker) => worker.id === workerID);
+
+            if (foundWorker !== undefined && foundWorker.available === true) {
+                availableWorkers.push(`${worker.name} ${worker.surname}`);
+            }
+        }
+    });
+
+    return availableWorkers;
+}
+
 
 
 async function main(): Promise<void> {
@@ -108,13 +153,18 @@ async function main(): Promise<void> {
         console.log("2. Пошук працівників по категорії: getWorkersSurnamesByCategory()");
         console.log("3. Стрілочна ф-ія, всі Developer'и: (worker) => {");
         console.log("4. Пошук працівника по ID: getWorkerByID()");
+        console.log("5. Конкатенація імені та айді: createCustomerID()");
+        console.log("6. Створення ID через idGenerator");
+        console.log("7. Створення замовника: createCustomer()");
+        console.log("8. Пошук доступних працівників для замовника: checkoutWorkers()");
+        console.log("9. Виклик функцій зі значеннями за замовчуванням");
         console.log("БУДЬ-ЯКИЙ ІНШИЙ ВВІД. Завершити виконання програми");
 
         let choice: string = await input("\nВиберіть пункт в меню(1, 2, ...): ");
 
         switch (choice) {
             case "1":
-                let result = logFirstAvailable(getAllWorkers());
+                let result: logResult = logFirstAvailable();
 
                 console.log(`\nВсього ${result.workers_count} працівники(-ів)`);
                 console.log(`Перший доступний працівник: ${result.first_available_name} ${result.first_available_surname}`);
@@ -159,7 +209,7 @@ async function main(): Promise<void> {
 
                     default:
                         console.log("Повернення у меню");
-                        return;
+                        continue;
                 }
 
                 const surnames: Array<string> = getWorkersSurnamesByCategory(category);
@@ -168,7 +218,7 @@ async function main(): Promise<void> {
                 break;
 
             case "3":
-                let workers = getAllWorkers();
+                let workers: Worker[] = getAllWorkers();
 
                 console.log("\nВсі працівники категорії Developer: ");
 
@@ -181,13 +231,63 @@ async function main(): Promise<void> {
 
             case "4":
                 let chosen_id: number = Number(await input("\nВведіть ID користувача для пошуку: "));
-                let userData = getWorkerByID(chosen_id)
-                console.log(`Користувач з айді "${userData.id}": ${userData.name} ${userData.surname}`)
+                let userData: workerData = getWorkerByID(chosen_id);
+
+                console.log(`Користувач з айді "${chosen_id}": ${userData.name} ${userData.surname}`);
+                console.log(`Заробітна плата: ${userData.salary}`);
+                break;
+
+            case "5":
+                let customerName: string = await input("\nВведіть ім'я клієнта: ");
+                let customerId: number = Number(await input("Введіть ID клієнта: "));
+
+                console.log(createCustomerID(customerName, customerId));
+
+                // Мої дані (Завдання 1.4 - 2):
+                let myID: string = createCustomerID("Олександр Кииченко", 6);
+                console.log(`Мої дані: ${myID}`);
+                break;
+
+            case "6":
+                idGenerator = createCustomerID;
+
+                console.log(`Результат idGenerator: ${idGenerator("Олександр Кииченко", 6)}`);
+                break;
+
+            case "7":
+                createCustomer("Олександр Кииченко");
+                createCustomer("Олександр Кииченко", 20);
+                createCustomer("Олександр Кииченко", 20, "Київ");
+                break;
+
+            case "8":
+                const myWorkers: string[] = checkoutWorkers("Олександр Кииченко", 1, 4, 6);
+
+                console.log("Доступні працівники:");
+
+                myWorkers.forEach((worker) => {
+                    console.log(worker);
+                });
+                break;
+
+            case "9":
+                console.log("\nВиклик getWorkersSurnamesByCategory() без параметра:");
+                const defaultCategoryWorkers: Array<string> = getWorkersSurnamesByCategory();
+
+                defaultCategoryWorkers.forEach((worker) => {
+                    console.log(worker);
+                });
+
+                console.log("\nВиклик logFirstAvailable() без параметра:");
+                const defaultResult: logResult = logFirstAvailable();
+
+                console.log(`Всього ${defaultResult.workers_count} працівники(-ів)`);
+                console.log(`Перший доступний працівник: ${defaultResult.first_available_name} ${defaultResult.first_available_surname}`);
                 break;
 
             default:
                 rl.close();
-                break;
+                return;
         }
     }
 }
