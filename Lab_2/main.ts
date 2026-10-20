@@ -1,6 +1,6 @@
 // ВВІД В КОНСОЛЬ, мб видалю
 
-import { createInterface } from "readline";
+import { createInterface } from "node:readline";
 
 const rl = createInterface({
     input: process.stdin,
@@ -48,12 +48,53 @@ interface Worker {
 
 
 
-// ЗМІННІ / ЗМІННІ-ФУНКЦІЇ
+// КЛАСИ
+
+class UniversityLibrarian implements Librarian {
+    name!: string;
+    email!: string;
+    departament!: string;
+
+    assistCustomer(custName: string): void {
+        console.log(`${this.name} is assisting ${custName}`);
+    }
+}
+
+class ReferenceItem {
+    // title: string;
+    // year: number;
+
+    static readonly department: string = "Mystery";
+    private _publisher: string = "";
+    constructor (public title: string, private readonly year: number) {}
+
+    // constructor (newTitle: string, newYear: number) {
+    //     console.log("Creating a new ReferenceItem ...");
+    //     this.title = newTitle;
+    //     this.year = newYear;
+    // }
+
+    get publisher(): string {
+        return this._publisher.toUpperCase();
+    }
+
+    set publisher(newPublisher: string) {
+        this._publisher = newPublisher;
+    }
+
+    printItem(): void {
+        console.log(`${this.title} was published in ${this.year}`);
+        console.log(`Department: ${ReferenceItem.department}`);
+    }
+}
+
+
+
+// ЗМІННІ
 
 const logPrize: PrizeLogger = prize => 
-    console.log(`Prize received: ${prize}`);
-
-logPrize("Employee of the Month");
+    console.log(`Prize: ${prize}`);
+logPrize("prize1");
 
 const favoriteAuthor: Author = {
     name: "Oleksamdr",
@@ -61,15 +102,26 @@ const favoriteAuthor: Author = {
     numBooksPublished: 1
 };
 
-const favoriteLibrarian: Librarian = {
-    name: "Ivan",
-    email: "pechenenko@knu.ua",
-    departament: "Mistics",
-    assistCustomer(custName: string): void{
-        console.log(`${this.name} helped ${custName}`);
-    }
+const favoriteLibrarian: Librarian = new UniversityLibrarian();
+favoriteLibrarian.name = "Mykhailo";
+favoriteLibrarian.assistCustomer("Ivan");
 
-}
+const ref = new ReferenceItem("Kolobok", 1860);
+ref.printItem();
+ref.publisher = "Me";
+console.log(ref.publisher);
+
+// const favoriteLibrarian: Librarian = {
+//     name: "Ivan",
+//     email: "pechenenko@knu.ua",
+//     departament: "Mystery",
+//     assistCustomer(custName: string): void{
+//         console.log(`${this.name} is assisting ${custName}`);
+//     }
+
+// }
+
+
 
 // ФУНКЦІЇ
 
@@ -94,5 +146,3 @@ function getWorkerByID(id: number, workers: Worker[] = getAllWorkers()): Worker 
 function PrintWorker(worker: Worker): void {
     console.log(`${worker.name} ${worker.surname} got salary ${worker.salary}`);
 }
-
-console.log(logPrize);
