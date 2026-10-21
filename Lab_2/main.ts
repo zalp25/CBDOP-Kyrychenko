@@ -1,22 +1,3 @@
-// ВВІД В КОНСОЛЬ, мб видалю
-
-import { createInterface } from "node:readline";
-
-const rl = createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-function input(question: string): Promise<string> {
-    return new Promise((resolve) => {
-        rl.question(question, (answer: string): void => {
-            resolve(answer);
-        });
-    });
-}
-
-
-
 // ІНТЕРФЕЙСИ
 
 interface Person {
@@ -60,13 +41,15 @@ class UniversityLibrarian implements Librarian {
     }
 }
 
-class ReferenceItem {
+abstract class ReferenceItem {
     // title: string;
     // year: number;
 
     static readonly department: string = "Mystery";
     private _publisher: string = "";
-    constructor (public title: string, private readonly year: number) {}
+    constructor (public title: string, protected readonly year: number) {
+        console.log("Creating a new ReferenceItem ...");
+    }
 
     // constructor (newTitle: string, newYear: number) {
     //     console.log("Creating a new ReferenceItem ...");
@@ -85,6 +68,24 @@ class ReferenceItem {
     printItem(): void {
         console.log(`${this.title} was published in ${this.year}`);
         console.log(`Department: ${ReferenceItem.department}`);
+    }
+
+    abstract printCitation(): void;
+}
+
+class Encyclopedia extends ReferenceItem {
+    constructor(title: string, year: number, public edition: number) {
+        console.log("Creating a new Encyclopedia ...");
+        super(title, year);
+    }
+    
+    printItem(): void {
+        super.printItem();
+        console.log(`Edition: ${this.edition} (${this.year})`);
+    }
+
+    printCitation(): void {
+        console.log(`${this.title} - ${this.year}`);
     }
 }
 
@@ -106,10 +107,14 @@ const favoriteLibrarian: Librarian = new UniversityLibrarian();
 favoriteLibrarian.name = "Mykhailo";
 favoriteLibrarian.assistCustomer("Ivan");
 
-const ref = new ReferenceItem("Kolobok", 1860);
-ref.printItem();
-ref.publisher = "Me";
-console.log(ref.publisher);
+// const ref = new ReferenceItem("Kolobok", 1860);
+// ref.printItem();
+// ref.publisher = "Me";
+// console.log(ref.publisher);
+
+const refBook = new Encyclopedia("Name", 2000, 1);
+refBook.printItem();
+refBook.printCitation();
 
 // const favoriteLibrarian: Librarian = {
 //     name: "Ivan",
