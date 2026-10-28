@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  max-width: 500px;
+  margin: 40px auto;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  color: #6ea8fe;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  color: #ddd;
+  background: #2b2b2b;
+  border: 1px solid #555;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
