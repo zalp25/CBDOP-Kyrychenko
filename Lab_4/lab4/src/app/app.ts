@@ -1,0 +1,13 @@
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Child } from './child/child';
+
+@Component({
+  selector: 'app-root',
+  imports: [FormsModule, Child],
+  templateUrl: './app.html',
+  styleUrl: './app.css'
+})
+export class App {
+  text = '';
+}
