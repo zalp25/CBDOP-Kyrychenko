@@ -1,0 +1,28 @@
+<table>
+  <thead>
+    <tr>
+      <th>Вибране</th>
+      <th>Повне ім'я</th>
+      <th>Нікнейм</th>
+      <th>Факультет</th>
+      <th>Дата народження</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (c of service.favorites(); track c.index) {
+      <tr (click)="service.selected.set(c)">
+        <td class="checkbox-cell">
+            <input type="checkbox"
+                [checked]="service.isFavorite(c)"
+                (click)="$event.stopPropagation(); service.toggleFavorite(c)">
+        </td>
+        <td>{{ c.fullName }}</td>
+        <td>{{ c.nickname }}</td>
+        <td>{{ c.hogwartsHouse }}</td>
+        <td>{{ c.birthdate }}</td>
+      </tr>
+    } @empty {
+      <tr><td colspan="5">Нічого не вибрано</td></tr>
+    }
+  </tbody>
+</table>

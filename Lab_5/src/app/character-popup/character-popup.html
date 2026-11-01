@@ -1,0 +1,16 @@
+@if (service.selected(); as c) {
+  <div class="overlay" (click)="service.selected.set(null)">
+    <div class="popup" (click)="$event.stopPropagation()">
+      <img [src]="c.image" [alt]="c.fullName" width="150">
+      <h2>{{ c.fullName }}</h2>
+      <p>Нікнейм: {{ c.nickname }}</p>
+      <p>Факультет: {{ c.hogwartsHouse }}</p>
+      <p>Дата народження: {{ c.birthdate }}</p>
+      <p>Виконавець ролі: {{ c.interpretedBy }}</p>
+      <button (click)="service.toggleFavorite(c)">
+        {{ service.isFavorite(c) ? 'Прибрати з вибраного' : 'У вибране' }}
+      </button>
+      <button (click)="service.selected.set(null)">Закрити</button>
+    </div>
+  </div>
+}
