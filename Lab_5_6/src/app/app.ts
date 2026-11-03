@@ -13,10 +13,8 @@ import { CharacterPopup } from './character-popup/character-popup';
 })
 export class App implements OnInit {
   service = inject(CharactersService);
-
-  protected readonly title = signal('Lab_5');
-
-  ngOnInit() {
+  
+  ngOnInit(): void {
     this.service.load();
   }
 }
