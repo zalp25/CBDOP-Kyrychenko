@@ -4,10 +4,10 @@ import { CharactersService } from './characters-service';
 import { CharactersTable } from './characters-table/characters-table';
 import { Favorites } from './favorites/favorites';
 import { CharacterPopup } from './character-popup/character-popup';
-
+import { Graphics } from './graphics/graphics'
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CharactersTable, Favorites, CharacterPopup],
+  imports: [RouterOutlet, CharactersTable, Favorites, CharacterPopup, Graphics],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
