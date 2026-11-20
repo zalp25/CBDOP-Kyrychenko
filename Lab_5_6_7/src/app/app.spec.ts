@@ -15,7 +15,10 @@ describe('App', () => {
       selected: signal<Character | null>(null),
       isFavorite: vi.fn().mockReturnValue(false),
       toggleFavorite: vi.fn(),
+      loading: signal(false),
+      error: signal<string | null>(null),
       load: vi.fn().mockResolvedValue(undefined),
+      closeError: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
@@ -40,6 +43,27 @@ describe('App', () => {
   it('повинен завантажити дані при старті', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
+
+    expect(serviceMock.load).toHaveBeenCalled();
+  });
+
+  it('повинен показати помилку на екрані', () => {
+    const fixture = TestBed.createComponent(App);
+    serviceMock.error.set("Немає з'єднання з сервером");
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.error').textContent).toContain(
+      "Немає з'єднання з сервером",
+    );
+  });
+
+  it('кнопка "Спробувати ще раз" повинна заново викликати load', () => {
+    const fixture = TestBed.createComponent(App);
+    serviceMock.error.set('Помилка');
+    fixture.detectChanges();
+    serviceMock.load.mockClear();
+
+    fixture.nativeElement.querySelector('.error button').click();
 
     expect(serviceMock.load).toHaveBeenCalled();
   });

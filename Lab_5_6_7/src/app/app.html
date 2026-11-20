@@ -1,5 +1,16 @@
+@if (service.error(); as error) {
+  <div class="error">
+    <span>Помилка: {{ error }}</span>
+    <button (click)="service.load()">Спробувати ще раз</button>
+    <button (click)="service.closeError()">Закрити</button>
+  </div>
+}
 <h1>ТАБЛИЦЯ ВСІХ ПЕРСОНАЖІВ</h1>
-<app-characters-table />
+@if (service.loading()) {
+  <p>Завантаження...</p>
+} @else {
+  <app-characters-table />
+}
 <hr>
 <h1>ТАБЛИЦЯ УЛЮБЛЕНИХ ПЕРСОНАЖІВ</h1>
 <app-favorites />

@@ -65,4 +65,16 @@ describe('CharactersTable', () => {
 
     expect(serviceMock.toggleFavorite).toHaveBeenCalledWith(harry);
   });
+
+  it('при зміні сортування повинна змінюватись стратегія', () => {
+    serviceMock.characters.set([harry, { ...harry, fullName: 'Albus Dumbledore', index: 1 }]);
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('select');
+
+    select.value = '1';
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(component.strategy().title).toBe("За ім'ям");
+    expect(fixture.nativeElement.querySelector('tbody tr').textContent).toContain('Albus Dumbledore');
+  });
 });

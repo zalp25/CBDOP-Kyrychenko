@@ -2,3 +2,8 @@ td.checkbox-cell {
   text-align: center;
   vertical-align: middle;
 }
+
+label {
+  display: block;
+  margin-bottom: 8px;
+}

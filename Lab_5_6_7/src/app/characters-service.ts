@@ -1,43 +1,65 @@
-import { Injectable, signal, WritableSignal, inject } from '@angular/core';
-import axios from 'axios';
+import { Injectable, signal, inject } from '@angular/core';
 import { Character } from './interfaces/character';
-import { Storage } from '@ionic/storage-angular';
+import { CharactersApi } from './api/characters-api';
+import { FavoritesStorage } from './storage/favorites-storage';
 
 @Injectable({
   providedIn: 'root',
 })
-
-
 export class CharactersService {
-  characters = signal<Character[]>([]);
-  selected = signal<Character | null>(null);
-  favorites = signal<Character[]>([]);
+  readonly characters = signal<Character[]>([]);
+  readonly selected = signal<Character | null>(null);
+  readonly favorites = signal<Character[]>([]);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
 
-  private storage = inject(Storage);
+  private readonly api = inject(CharactersApi);
+  private readonly storage = inject(FavoritesStorage);
 
   async load(): Promise<void> {
-    await this.storage.create();
-    const saved = await this.storage.get('favorites');
-    this.favorites.set(saved ?? []);
-    // console.log(favorites)
+    this.loading.set(true);
+    this.error.set(null);
 
-    const res = await axios.get('https://potterapi-fedeperin.vercel.app/en/characters');
-    // console.log(res);
-    this.characters.set(res.data);
+    try {
+      this.favorites.set(await this.storage.load());
+    } catch {
+      this.favorites.set([]);
+      this.error.set('Не вдалося прочитати вибране зі сховища');
+    }
+
+    try {
+      const list = await this.api.getAll();
+      this.characters.set(list);
+      this.favorites.update((fav) => fav.map((f) => list.find((c) => c.index === f.index) ?? f));
+    } catch (e) {
+      this.characters.set([]);
+      this.error.set(e instanceof Error ? e.message : 'Невідома помилка');
+    } finally {
+      this.loading.set(false);
+    }
   }
 
-
-
   isFavorite(c: Character): boolean {
-    return this.favorites().some(f => f.index === c.index);
+    return this.favorites().some((f) => f.index === c.index);
   }
 
   async toggleFavorite(c: Character): Promise<void> {
+    const old = this.favorites();
     if (this.isFavorite(c)) {
-      this.favorites.update(list => list.filter(f => f.index !== c.index));
+      this.favorites.update((list) => list.filter((f) => f.index !== c.index));
     } else {
-      this.favorites.update(list => [...list, c]);
+      this.favorites.update((list) => [...list, c]);
     }
-    await this.storage.set('favorites', this.favorites());
+
+    try {
+      await this.storage.save(this.favorites());
+    } catch {
+      this.favorites.set(old);
+      this.error.set('Не вдалося зберегти вибране. Спробуйте ще раз');
+    }
+  }
+
+  closeError(): void {
+    this.error.set(null);
   }
 }
